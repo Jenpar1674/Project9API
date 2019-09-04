@@ -9,7 +9,8 @@ module.exports = (sequelize, DataTypes) => {
     materialsNeeded: DataTypes.STRING
   }, {});
   Course.associate = function(models) {
+    Course.belongsTo(models.User);
+    }
     // associations can be defined here
   };
   return Course;
-};
