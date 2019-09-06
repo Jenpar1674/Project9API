@@ -1,16 +1,13 @@
 var express = require('express');
 var router = express.Router();
-// const User = require("../models").Users;
+var User = require("../models").Users;
+const authenticateUser = require('./authenticate');
+const Sequelize = require('sequelize');
 
-function asyncHandler(cb){
-  return async (req,res, next) => {
-      try {
-          await cb(req, res, next);
-      } catch(err) {
-          next(err);
-      }
-  }
-}
+router.get('/', authenticateUser, (req, res) => {
+  // Set status and return currently authenticated User
+  res.status(200).json(req.currentUser);
+});
 // GET method route
 app.get('/', function (req, res) {
   res.send('GET request to the homepage')
