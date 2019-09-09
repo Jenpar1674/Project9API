@@ -32,7 +32,7 @@ app.use(morgan('dev'));
 
 const models = require('./models');
 const sequelize = models.sequelize;
-const { User, Course } = models;
+//const { User, Course } = models;
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
