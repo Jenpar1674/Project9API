@@ -65,26 +65,44 @@ const authenticateUser = async (req, res, next) => {
       next();
     }
   }
+  const filterOut = {
+    include: [{
+      model: User,
+      attributes: {exclude: ['password', 'createdAt', 'updatedAt']}
+    }],
+    attributes: {exclude: ['createdAt', 'updatedAt']}
+  }
   //GET/api/courses 200 
-  router.get('/courses', asyncHandler(async (req, res) => {
-    const allCourses = await Course.findAll({
-      // Exclude private or unecessary info
-      attributes: {
-        exclude: ['createdAt', 'updatedAt'],
-      },
-      include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: {
-            exclude: ['password', 'createdAt', 'updatedAt'],
-          },
-        },
-      ],
-    });
-    res.json(allCourses);
-  })
-  );
+  router.get('/', (req, res, next)=>{
+    Course.findAll(filterOut)
+    .then(courses => {
+      if (courses) {
+        res.status(200).json(courses);
+      } else {
+        res.status(404).json({message: "Sorry, couldn't find this page. Try again."});
+      }
+    }).catch(err => res.json({message: err.message}));
+  });
+  
+  // router.get('/', asyncHandler(async (req, res) => {
+  //   const allCourses = await Course.findAll({
+  //     // Exclude private or unecessary info
+  //     attributes: {
+  //       exclude: ['createdAt', 'updatedAt'],
+  //     },
+  //     include: [
+  //       {
+  //         model: User,
+  //         as: 'user',
+  //         attributes: {
+  //           exclude: ['password', 'createdAt', 'updatedAt'],
+  //         },
+  //       },
+  //     ],
+  //   });
+  //   res.json(allCourses);
+  // })
+  // );
 
   //'GET/api/courses/:id 200'
   router.get('/courses', asyncHandler(async (req, res) => {

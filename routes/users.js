@@ -2,69 +2,27 @@ var express = require('express');
 var router = express.Router();
 var User = require("../models").Users;
 const users = [];
-//const authenticateUser = require('./authentication');
+const authenticateUser = require('./authenticate');
 const Sequelize = require('sequelize');
 const { check, validationResult } = require('express-validator');
 const bcryptjs = require('bcryptjs');
 const auth = require('basic-auth');
 
-const authenticateUser =(req, res, next)=>{
-  let message = null;
-  // Parse the user's credentials from the Authorization header.
-  const credentials = auth(req);
-   // If the user's credentials are available...
-   if (credentials) {
-    // Attempt to retrieve the user from the data store
-    // by their username (i.e. the user's "key"
-    // from the Authorization header).
-    const user = users.find(u => u.username === credentials.name);
 
-    // If a user was successfully retrieved from the data store...
-    if (user) {
-      // Use the bcryptjs npm package to compare the user's password
-      // (from the Authorization header) to the user's password
-      // that was retrieved from the data store.
-      const authenticated = bcryptjs
-        .compareSync(credentials.pass, user.password);
 
-      // If the passwords match...
-      if (authenticated) {
-        console.log(`Authentication successful for username: ${user.username}`);
-
-        // Then store the retrieved user object on the request object
-        // so any middleware functions that follow this middleware function
-        // will have access to the user's information.
-        req.currentUser = user;
-      } else {
-        message = `Authentication failure for username: ${user.username}`;
-      }
-    } else {
-      message = `User not found for username: ${credentials.name}`;
-    }
-  } else {
-    message = 'Auth header not found';
-  }
-
-  // If user authentication failed...
-  if (message) {
-    console.warn(message);
-
-    // Return a response with a 401 Unauthorized HTTP status code.
-    res.status(401).json({ message: 'Access Denied' });
-  } else {
-    // Or if user authentication succeeded...
-    // Call the next() method.
-    next();
-  }
-};
-
-  // Set status and return currently authenticated User
-//   res.status(200).json(req.currentUser);
-// });
+//Send a GET request to /users to return the currently authenticated user
+router.get('/', authenticateUser, (req, res, next) => {
+    return res.status(200).json({    
+    userId: req.currentUser.get("id"),
+    firstName: req.currentUser.get("firstName"),
+    lastName: req.currentUser.get("lastName"),
+    emailAddress: req.currentUser.get("emailAddress")
+  });
+});
 // GET method route
-router.get('/', function (req, res) {
-  res.send('GET request to the homepage')
-})
+// router.get('/', function (req, res) {
+//   res.send('GET request to the homepage')
+// })
 
 // POST method route- works
 router.post('/', function (req, res) {
