@@ -40,7 +40,10 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
-
+// Redirect to api route
+app.get("/", function(req, res, next) {
+  res.redirect("/api");
+});
 // send 404 if no other route matched
 app.use((req, res) => {
   res.status(404).json({
