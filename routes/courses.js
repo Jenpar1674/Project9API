@@ -114,4 +114,43 @@ const authenticateUser = async (req, res, next) => {
     res.status(201).end();
   })
   );
+
+  
+//PUT/api/courses/:id 204 -
+  router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res, next) => {
+    let course = await Course.findByPk(req.params.id);
+    // Checking if the user is the owner of the course
+    if(course.userId === req.body.userId) {
+      course.title = req.body.title;
+      course.description = req.body.description;
+      course.estimatedTime = req.body.estimatedTime;
+      course.materialsNeeded = req.body.materialsNeeded;
+      //Course model validations 
+      course = await course.update(req.body);
+      res.status(204).end();
+    } else {
+      // Forbidden from updated course
+      const err = new Error(`Forbidden - You don't have permission to do this`);
+      err.status = 403;
+      next(err);
+    }
+  })
+  );
+  // Send a DELETE request to /courses/:id 
+  router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res, next) => {
+    const course = await Course.findByPk(req.params.id);
+    // Delete course only if user is the owner
+    if(course.userId === req.body.userId) {
+      await course.destroy();
+      res.status(204).end();
+    } else {
+      //Forbidden from updated course
+      const err = new Error(`Forbidden - You don't have permission to do this`);
+      err.status = 403;
+      next(err);
+    }
+  })
+  );
+  
+  
 module.exports = router;
