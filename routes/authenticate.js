@@ -2,7 +2,7 @@ const auth = require('basic-auth');
 const bcryptjs = require('bcryptjs');
 const {User} = require('../models');
 
-
+//user authentication middleware
 const authenticateUser =(req, res, next)=>{
     let message = null;
     // Parse the user's credentials from the Authorization header.
