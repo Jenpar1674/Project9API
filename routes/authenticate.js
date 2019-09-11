@@ -3,7 +3,7 @@ const bcryptjs = require('bcryptjs');
 const {User} = require('../models');
 
 //user authentication middleware
-const authenticateUser =(req, res, next)=>{
+const authenticateUser = async (req, res, next)=>{
     let message = null;
     // Parse the user's credentials from the Authorization header.
     const credentials = auth(req);
@@ -12,8 +12,9 @@ const authenticateUser =(req, res, next)=>{
       // Attempt to retrieve the user from the data store
       // by their username (i.e. the user's "key"
       // from the Authorization header).
-      const user = users.find(u => u.username === credentials.name);
-  
+      const user = await user.findOne({
+        where: {emailAddress: credentials.name}
+      });
       // If a user was successfully retrieved from the data store...
       if (user) {
         // Use the bcryptjs npm package to compare the user's password
@@ -24,14 +25,14 @@ const authenticateUser =(req, res, next)=>{
   
         // If the passwords match...
         if (authenticated) {
-          console.log(`Authentication successful for username: ${user.username}`);
+          console.log(`Authentication successful for username: ${user.emailAddress}`);
   
           // Then store the retrieved user object on the request object
           // so any middleware functions that follow this middleware function
           // will have access to the user's information.
           req.currentUser = user;
         } else {
-          message = `Authentication failure for username: ${user.username}`;
+          message = `Authentication failure for username: ${user.emailAddress}`;
         }
       } else {
         message = `User not found for username: ${credentials.name}`;

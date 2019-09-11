@@ -28,7 +28,7 @@ const auth = require('basic-auth');
 // }
 
 //Send a GET request to /users to return the currently authenticated user
-router.get('/', authenticateUser, (req, res, next) => {
+router.get('/users', authenticateUser, (req, res, next) => {
     return res.status(200).json({    
     userId: req.currentUser.get("id"),
     firstName: req.currentUser.get("firstName"),
@@ -42,7 +42,7 @@ router.get('/', authenticateUser, (req, res, next) => {
 // })
 
 // POST method route- works
-router.post('/', function (req, res) {
+router.post('/users', function (req, res) {
   const user = req.body;
   users.push(user);
   //res.send('POST request to the homepage')
