@@ -4,71 +4,8 @@ const { Course, User } = require('../models');
 const authenticateUser = require('./authenticate');
 const { check, validationResult } = require('express-validator');
 
-const asyncHandler = cb => {
-    return async (req, res, next) => {
-      try {
-        await cb(req, res, next);
-      } catch(err) {
-        console.log('Error 500 - Internal Server Error');
-        next(err);
-      }
-    }
-  }
 
-//User authentication middleware
-// const authenticateUser = async (req, res, next) => {
-//     let message;
-//     // Parse the user's credentials from the Authorization header.
-//     const credentials = auth(req);
-//     if(credentials) {
-//       //Find user with matching email address
-//       const user = await User.findOne({
-//           raw: true,
-//           where: {
-//             emailAddress: credentials.name,
-//           },
-//       });
-//       //If user matches email
-//       if(user) {
-//         // Use the bcryptjs npm package to compare the user's password
-//         // (from the Authorization header) to the user's password
-//         // that was retrieved from the data store.
-//         const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
-//         //If password matches
-//         if(authenticated) {
-//           console.log(`Authentication successful for user: ${user.firstName} ${user.lastName}`);
-//           if(req.originalUrl.includes('courses')) {
-//             //If route has a courses endpoint, set request userId to matched user id
-//             req.body.userId = user.id;
-//           } else if(req.originalUrl.includes('users')) {
-//             //If route has a users endpoint, set request id to matched user id
-//             req.body.id = user.id;
-//           }
-//         } else {
-//           //Otherwise the Authentication failed
-//           message = `Authentication failed for user: ${user.firstName} ${user.lastName}`;
-//         }
-//       } else {
-//         // No email matching the Authorization header
-//         message = `User not found for email address: ${credentials.name}`;
-//       }
-//     } else {
-//       //No user credentials/authorization header available
-//       message = 'Authorization header not found';
-//     }
-//     // Deny Access if there is anything stored in message
-//     if(message) {
-//       console.warn(message);
-//       const err = new Error('Access Denied');
-//       err.status = 403;
-//       next(err);
-//     } else {
-//       //User authenticated
-//       next();
-//     }
-//   }
-
-  const filterOut = {
+const filterOut = {
     include: [{
       model: User,
       attributes: {exclude: ['password', 'createdAt', 'updatedAt']}
@@ -76,7 +13,7 @@ const asyncHandler = cb => {
     attributes: {exclude: ['createdAt', 'updatedAt']}
   }
   //GET/api/courses 200 
-  router.get('/courses', (req, res, next)=>{
+  router.get('/', (req, res, next)=>{
     Course.findAll(filterOut)
     .then(courses => {
       if (courses) {
@@ -87,27 +24,9 @@ const asyncHandler = cb => {
     }).catch(err => res.json({message: err.message}));
   });
   
-  // router.get('/courses', asyncHandler(async (req, res) => {
-  //   const allCourses = await Course.findAll({
-  //     // Exclude private or unecessary info
-  //     attributes: {
-  //       exclude: ['createdAt', 'updatedAt'],
-  //     },
-  //     include: [
-  //       {
-  //         model: User,
-  //         as: 'user',
-  //         attributes: {
-  //           exclude: ['password', 'createdAt', 'updatedAt'],
-  //         },
-  //       },
-  //     ],
-  //   });
-  //   res.json(allCourses);
-  // })
-  // );
+  
 // Send a GET request to /courses/:id to READ(view) a course (including the user that owns the course) for the provided course ID
-router.get('/courses/:id', (req, res, next)=>{
+router.get('/:id', (req, res, next)=>{
   Course.findByPk(req.params.id, filterOut)
   .then(course => {
     if (course) {
@@ -118,32 +37,9 @@ router.get('/courses/:id', (req, res, next)=>{
   }).catch(err => res.json({message: err.message}));
 });
 
-  // //'GET/api/courses/:id 200'
-
-  // router.get('/courses/:id', asyncHandler(async (req, res) => {
-  //   const course = await Course.findAll({
-  //     where: {
-  //       id: req.params.id,
-  //     },
-  //     // Exclude private or unecessary info
-  //     attributes: {
-  //       exclude: ['createdAt', 'updatedAt'],
-  //     },
-  //     include: [
-  //       {
-  //         model: User,
-  //         as: 'user',
-  //         attributes: {
-  //           exclude: ['password', 'createdAt', 'updatedAt'],
-  //         },
-  //       },
-  //     ],
-  //   });
-  //   res.json(course);
-  // })
-  // );
+   
   //POST/api/courses 201 
-  router.post('/courses', [
+  router.post('/', [
     // Validations
     check('title')
       .exists({ checkNull: true, checkFalsy: true })
@@ -186,17 +82,11 @@ router.get('/courses/:id', (req, res, next)=>{
       }
     }
   }); 
-  // router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
-  //   // Model validations for User model
-  //   const createCourse = await Course.create(req.body);
-  //   res.location(`/api/courses/${createCourse.id}`);
-  //   res.status(201).end();
-  // })
-  // );
+  
 
   
 //PUT/api/courses/:id 204 -
-router.put('/courses/:id', [
+router.put('/:id', [
   // Validations
   check('title')
     .exists({ checkNull: true, checkFalsy: true })
@@ -231,11 +121,11 @@ router.put('/courses/:id', [
               res.status(403).json({message: 'Sorry, you are not authorized to edit this page.'});
             }
           } else {
-            res.status(404).json({message: "Oops! That ID does not exist. Try again."});
+            res.status(404).json({message: " ID does not exist. Try again."});
           }
       }).catch(err => {
         if(err.name === 'SequelizeValidationError') {
-          res.status(400).json({message: "Hmm...Something's not right. Please fill out all the required fields."})
+          res.status(400).json({message: "Please fill out all the required fields."})
         } else {
           res.json({message: err.message});
         }
@@ -244,27 +134,9 @@ router.put('/courses/:id', [
   }
 });
 
-  // router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res, next) => {
-  //   let course = await Course.findByPk(req.params.id);
-  //   // Checking if the user is the owner of the course
-  //   if(course.userId === req.body.userId) {
-  //     course.title = req.body.title;
-  //     course.description = req.body.description;
-  //     course.estimatedTime = req.body.estimatedTime;
-  //     course.materialsNeeded = req.body.materialsNeeded;
-  //     //Course model validations 
-  //     course = await course.update(req.body);
-  //     res.status(204).end();
-  //   } else {
-  //     // Forbidden from updated course
-  //     const err = new Error(`Forbidden - You don't have permission to do this`);
-  //     err.status = 403;
-  //     next(err);
-  //   }
-  // })
-  // );
+  
   // Send a DELETE request to /courses/:id 
-  router.delete("/courses/:id", authenticateUser, (req, res, next) => {
+  router.delete("/:id", authenticateUser, (req, res, next) => {
     const user = req.currentUser;
     Course.findByPk(req.params.id).then((course) => {
         if (course) {
@@ -280,7 +152,7 @@ router.put('/courses/:id', [
       const error = new Error('Server error');
       error.status = 500;
       next(error);
-      // res.json({message: err.message});
+       res.json({message: err.message});
     });
   });
   // router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res, next) => {

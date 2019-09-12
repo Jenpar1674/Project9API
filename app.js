@@ -36,7 +36,7 @@ app.get("/", function(req, res, next) {
 
 
 const sequelize = models.sequelize;
-const { User, Course } = models;
+//const { User, Course } = models;
 
 // setup a friendly greeting for the root route
 // app.get('/', (req, res) => {
@@ -70,13 +70,13 @@ app.use(function(err, req, res, next) {
  res.json(err);
 });
 
-// set our port
-// app.set('port', process.env.PORT || 5000);
+//set our port
+app.set('port', process.env.PORT || 5000);
 
-// // start listening on our port
-// const server = app.listen(app.get('port'), () => {
-//   console.log(`Express server is listening on port ${server.address().port}`);
-// });
+// start listening on our port
+const server = app.listen(app.get('port'), () => {
+  console.log(`Express server is listening on port ${server.address().port}`);
+});
 
 module.exports = app;
 

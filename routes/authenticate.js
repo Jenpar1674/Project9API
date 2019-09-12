@@ -12,7 +12,7 @@ const authenticateUser = async (req, res, next)=>{
       // Attempt to retrieve the user from the data store
       // by their username (i.e. the user's "key"
       // from the Authorization header).
-      const user = await user.findOne({
+      const user = await User.findOne({
         where: {emailAddress: credentials.name}
       });
       // If a user was successfully retrieved from the data store...

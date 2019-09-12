@@ -3,7 +3,7 @@ var router = express.Router();
 var User = require("../models").Users;
 const users = [];
 const authenticateUser = require('./authenticate');
-const Sequelize = require('sequelize');
+//const Sequelize = require('sequelize');
 const { check, validationResult } = require('express-validator');
 const bcryptjs = require('bcryptjs');
 const auth = require('basic-auth');
@@ -28,7 +28,7 @@ const auth = require('basic-auth');
 // }
 
 //Send a GET request to /users to return the currently authenticated user
-router.get('/users', authenticateUser, (req, res, next) => {
+router.get('/', authenticateUser, (req, res, next) => {
     return res.status(200).json({    
     userId: req.currentUser.get("id"),
     firstName: req.currentUser.get("firstName"),
@@ -42,33 +42,40 @@ router.get('/users', authenticateUser, (req, res, next) => {
 // })
 
 // POST method route- works
-router.post('/', function (req, res) {
-  const user = req.body;
-  users.push(user);
-  //res.send('POST request to the homepage')
-  res.status(201).end();
-})
+// router.post('/', function (req, res) {
+//   const user = req.body;
+//   users.push(user);
+//   //res.send('POST request to the homepage')
+//   res.status(201).end();
+// })
 
 // Route that returns the current authenticated user.
-router.get('/', authenticateUser, (req, res) => {
-  const user = req.currentUser;
+// router.get('/', authenticateUser, (req, res) => {
+//   const user = req.currentUser;
 
-  res.json({
-    name: user.name,
-    username: user.username,
-  });
-});
+//   res.json({
+//     name: user.name,
+//     username: user.username,
+//   });
+// });
 // Route that creates a new user.
 router.post('/', [
-  check('name')
+  check('firstName')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "name"'),
-  check('username')
+    .withMessage('Please provide a value for "first name"'),
+  check('lastName')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "username"'),
+    .withMessage('Please provide a value for "last name"'),
+  check('emailAddress')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "email"')
+    .isEmail()
+    .withMessage('Please provide a valid email address for "email"'),
   check('password')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "password"'),
+    .withMessage('Please provide a value for "password"')
+    .isLength({ min: 8, max: 20 })
+    .withMessage('Please provide a "password" that is between 8 and 20 characters in length')
 ], async (req, res, next) => {
   // Attempt to get the validation result from the Request object.
   const errors = validationResult(req);
