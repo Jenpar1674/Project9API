@@ -42,7 +42,7 @@ router.get('/users', authenticateUser, (req, res, next) => {
 // })
 
 // POST method route- works
-router.post('/users', function (req, res) {
+router.post('/', function (req, res) {
   const user = req.body;
   users.push(user);
   //res.send('POST request to the homepage')
@@ -50,7 +50,7 @@ router.post('/users', function (req, res) {
 })
 
 // Route that returns the current authenticated user.
-router.get('/users', authenticateUser, (req, res) => {
+router.get('/', authenticateUser, (req, res) => {
   const user = req.currentUser;
 
   res.json({
@@ -59,7 +59,7 @@ router.get('/users', authenticateUser, (req, res) => {
   });
 });
 // Route that creates a new user.
-router.post('/users', [
+router.post('/', [
   check('name')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "name"'),
