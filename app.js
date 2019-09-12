@@ -1,9 +1,9 @@
 'use strict';
-//const createError = require('http-errors');
-//const path = require('path');
+const createError = require('http-errors');
+const path = require('path');
 // load modules
 const express = require('express');
-const morgan = require('morgan');
+const logger = require('morgan');
 //const routes = require('./routes');
 const models = require('./models');
 const indexRouter = require('./routes/index');
@@ -15,13 +15,13 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
-app.use(express.json());
-//app.use(express.urlencoded({ extended: false }));
-//app.use(express.static(path.join(__dirname, 'public')));
+app.use(logger('dev'));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api', indexRouter);
-app.use('/api', usersRouter);
-app.use('/api', coursesRouter);
+app.use('/', indexRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/courses', coursesRouter);
 
 // Redirect to api route
 app.get("/", function(req, res, next) {
@@ -35,8 +35,8 @@ app.get("/", function(req, res, next) {
 
 
 
-//const sequelize = models.sequelize;
-// const { User, Course } = models;
+const sequelize = models.sequelize;
+const { User, Course } = models;
 
 // setup a friendly greeting for the root route
 // app.get('/', (req, res) => {
@@ -56,24 +56,27 @@ app.use((req, res) => {
 });
 
 // setup a global error handler
-app.use((err, req, res, next) => {
-  if (enableGlobalErrorLogging) {
-    console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
-  }
-
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
   res.status(err.status || 500).json({
     message: err.message,
     error: {},
   });
+
+ // render the error page
+ res.status(err.status || 500);
+ res.json(err);
 });
 
 // set our port
-app.set('port', process.env.PORT || 5000);
+// app.set('port', process.env.PORT || 5000);
 
-// start listening on our port
-const server = app.listen(app.get('port'), () => {
-  console.log(`Express server is listening on port ${server.address().port}`);
-});
+// // start listening on our port
+// const server = app.listen(app.get('port'), () => {
+//   console.log(`Express server is listening on port ${server.address().port}`);
+// });
 
-
+module.exports = app;
 
