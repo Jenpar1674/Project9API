@@ -137,6 +137,7 @@ router.put(
             }
           } else {
             res.status(404).json({ message: " ID does not exist. Try again." });
+            return;
           }
         })
         .catch(err => {
