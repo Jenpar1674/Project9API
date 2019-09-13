@@ -32,7 +32,7 @@ app.get("/", function(req, res, next) {
 // setup morgan which gives us http request logging
 //app.use(morgan('dev'));
 
-// TODO setup your api routes here
+// TODO setup your api routes here////
 
 const sequelize = models.sequelize;
 //const { User, Course } = models;
