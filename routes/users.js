@@ -1,12 +1,12 @@
 var express = require("express");
 var router = express.Router();
-var User = require("../models").Users;
-const users = [];
+const {User} = require("../models");
+//const users = [];
 const authenticateUser = require("./authenticate");
 //const Sequelize = require('sequelize');
 const { check, validationResult } = require("express-validator");
 const bcryptjs = require("bcryptjs");
-const auth = require("basic-auth");
+//const auth = require("basic-auth");
 
 //Send a GET request to /users to return the currently authenticated user
 router.get("/", authenticateUser, (req, res, next) => {
@@ -51,7 +51,9 @@ router.post(
       const errorMessages = errors.array().map(error => error.msg);
 
       // Return the validation errors to the client.
-      return res.status(400).json({ errors: errorMessages });
+      const err = new Error(errorMessages);
+      err.status = 400;
+      next(err);   
     } else {
       // Get the user from the request body.
       const user = new User({

@@ -43,7 +43,7 @@ router.get("/:id", (req, res, next) => {
     .catch(err => res.json({ message: err.message }));
 });
 
-//POST/api/courses 201
+//POST/api/create new course
 router.post(
   "/",
   [
