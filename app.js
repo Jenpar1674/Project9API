@@ -9,13 +9,14 @@ const models = require("./models");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const coursesRouter = require("./routes/courses");
+var bodyParser = require('body-parser')
 // variable to enable global error logging
 const enableGlobalErrorLogging =
   process.env.ENABLE_GLOBAL_ERROR_LOGGING === "true";
 
 // create the Express app
 const app = express();
-
+app.use(bodyParser());
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -28,6 +29,7 @@ app.use("/api/courses", coursesRouter);
 app.get("/", function(req, res, next) {
   res.redirect("/api");
 });
+// create application/json parser
 
 // setup morgan which gives us http request logging
 //app.use(morgan('dev'));
