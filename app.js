@@ -13,12 +13,15 @@ var bodyParser = require('body-parser')
 // variable to enable global error logging
 const enableGlobalErrorLogging =
   process.env.ENABLE_GLOBAL_ERROR_LOGGING === "true";
-
+  var jsonParser = bodyParser.json()
 // create the Express app
 const app = express();
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({ extended:false }));
+// Parse application/json
+app.use(bodyParser.json());
+//var urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.use(logger("dev"));
-app.use(express.urlencoded({ extended: false }));
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
@@ -37,19 +40,11 @@ app.get("/", function(req, res, next) {
 // TODO setup your api routes here////
 
 const sequelize = models.sequelize;
-//const { User, Course } = models;
 
-// setup a friendly greeting for the root route
-// app.get('/', (req, res) => {
-//   res.json({
-//     message: 'Welcome to the REST API project!',
-//   });
-// });
-// Redirect to api route
-// app.get("/", function(req, res, next) {
-//   res.redirect("/api");
-// });
-//send 404 if no other route matched
+
+
+
+
 app.use((req, res) => {
   res.status(404).json({
     message: "Route Not Found"
